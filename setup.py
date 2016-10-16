@@ -12,6 +12,7 @@ setup(
     license="Apache License, Version 2.0",
     name="juno-addresses",
     packages=find_packages(),
+    test_suite='tests',
     url="https://github.com/kevinchristen/juno-addresses",
     version="0.1",
  )
