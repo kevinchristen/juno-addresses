@@ -73,7 +73,6 @@ def main():
         action='store_true',
         help='Include deleted entries')
     args = arg_parser.parse_args()
-    print(args)
     format_addresses(args.input, args.output, include_deleted=args.deleted)
 
 
