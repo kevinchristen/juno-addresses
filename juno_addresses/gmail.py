@@ -1,4 +1,7 @@
+# Copyright 2016, Kevin Christen and the juno-addresses contributors.
+
 from collections import defaultdict
+import argparse
 import csv
 import sys
 
@@ -16,7 +19,6 @@ COLUMNS = [
     'Phone 2 - Value',
     'Address 1 - Formatted',
 ]
-KEYS = [ 'Name', 'Email', 'Primary Phone', 'Mobile Phone', 'Address' ]
 
 
 def format_name(name):
@@ -34,21 +36,46 @@ def format_address(address):
     return ' '.join(address)
 
 
-HEADER = ','.join([ column[0] for column in COLUMNS ])
-
-
-if __name__ == '__main__':
-    writer = csv.writer(sys.stdout)
+def format_addresses(input, output, include_deleted=False):
+    writer = csv.writer(output)
     writer.writerow(COLUMNS)
-    with open(sys.argv[1], 'r') as contacts:
-        for entry in parser.parser(contacts):
-            if entry['Type'] == 'Entry' and not entry['Deleted']:
-                e = defaultdict(str)
-                for k, v in entry.items():
-                    e[k] = v
+
+    for entry in parser.parser(input):
+        print(entry)
+        if entry['Type'] == 'Entry' and (include_deleted or not entry['Deleted']):
+            e = defaultdict(str)
+            for k, v in entry.items():
+                e[k] = v
                 row = format_name(e['Name']) + \
                       ( e['Email'],
                         'Home', e['Primary Phone'],
                         'Mobile', e['Mobile Phone'],
                         format_address(e['Address']) )
-                writer.writerow(row)
+            writer.writerow(row)
+
+
+def main():
+    arg_parser = argparse.ArgumentParser(
+        description='Convert a Juno address book into a Gmail compatible CSV file.')
+    arg_parser.add_argument(
+        'input',
+        nargs='?',
+        type=argparse.FileType('r'),
+        default=sys.stdin,
+        help='Juno address book file (addrbook.nv). Defaults to stdin.')
+    arg_parser.add_argument(
+        'output',
+        nargs='?',
+        type=argparse.FileType('w'),
+        default=sys.stdout, help='Output file. Defaults to stdout.')
+    arg_parser.add_argument(
+        '-d', '--deleted',
+        action='store_true',
+        help='Include deleted entries')
+    args = arg_parser.parse_args()
+    print(args)
+    format_addresses(args.input, args.output, include_deleted=args.deleted)
+
+
+if __name__ == '__main__':
+    main()
