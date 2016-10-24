@@ -56,10 +56,7 @@ def format_addresses(input, output, include_deleted=False, mappings=[]):
                         format_address(e['Address']),
                       )
                 for mapped_field in mapped_fields:
-                    if mapped_field in entry:
-                        row = row + (entry[mapped_field],)
-                    else:
-                        row = row + ('',)
+                    row = row + (e[mapped_field],)
 
             writer.writerow(row)
 
